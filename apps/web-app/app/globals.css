@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cs-ink: #0b0f14;
+    --cs-ink-muted: #5c6675;
+    --cs-paper: #f5f7fb;
+    --cs-paper-strong: #ffffff;
+    --cs-accent: #2bd7ff;
+    --cs-accent-2: #ffb347;
+    --cs-accent-3: #1f3a5f;
+    --cs-stroke: #dbe1ea;
+    --cs-shadow: 12, 24, 40;
+    --cs-glow: 43, 215, 255;
+  }
+
+  * {
+    border-color: var(--cs-stroke);
+  }
+
+  body {
+    color: var(--cs-ink);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(43, 215, 255, 0.18), transparent 50%),
+      radial-gradient(circle at 85% 12%, rgba(255, 179, 71, 0.16), transparent 45%),
+      linear-gradient(180deg, #f8fafc 0%, #eef2f8 100%);
+    font-family: var(--font-body), sans-serif;
+  }
+
+  ::selection {
+    background: rgba(255, 122, 61, 0.25);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), serif;
+  }
+
+  .font-body {
+    font-family: var(--font-body), sans-serif;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(13, 18, 28, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13, 18, 28, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: 0 0;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 20px 60px rgba(var(--cs-shadow), 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .neon-ring {
+    box-shadow:
+      0 0 0 1px rgba(var(--cs-glow), 0.4),
+      0 0 24px rgba(var(--cs-glow), 0.25);
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(12, 18, 28, 0.03) 0px,
+      rgba(12, 18, 28, 0.03) 1px,
+      transparent 1px,
+      transparent 7px
+    );
+    background-size: 100% 8px;
+    background-position: 0 0;
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes modal-pop {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 1px rgba(var(--cs-glow), 0.3),
+        0 0 18px rgba(var(--cs-glow), 0.18);
+    }
+    50% {
+      box-shadow:
+        0 0 0 1px rgba(var(--cs-glow), 0.5),
+        0 0 28px rgba(var(--cs-glow), 0.28);
+    }
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-24px, 18px, 0);
+    }
+  }
+
+  @keyframes drift-wide {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(22px, -16px, 0);
+    }
+  }
+
+  .animate-rise {
+    animation: rise-in 0.8s ease forwards;
+  }
+
+  .animate-float {
+    animation: float-soft 9s ease-in-out infinite;
+  }
+
+  .animate-pop {
+    animation: modal-pop 0.6s ease both;
+  }
+
+  .animate-slide {
+    animation: slide-in 0.6s ease both;
+  }
+
+  .animate-glow {
+    animation: glow-pulse 2.6s ease-in-out infinite;
+  }
+
+  .animate-drift {
+    animation: drift 14s ease-in-out infinite;
+  }
+
+  .animate-drift-slow {
+    animation: drift-wide 22s ease-in-out infinite;
+  }
+
+  .corner-glow-cool {
+    background-image: linear-gradient(
+      135deg,
+      rgba(43, 215, 255, 0.22),
+      transparent 60%
+    );
+  }
+
+  .corner-glow-warm {
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 179, 71, 0.26),
+      transparent 60%
+    );
+  }
+
+  .corner-glow-mint {
+    background-image: linear-gradient(
+      135deg,
+      rgba(62, 219, 163, 0.22),
+      transparent 60%
+    );
+  }
+}

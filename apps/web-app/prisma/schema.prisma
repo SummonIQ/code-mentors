@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ChallengeStatus {
+  DRAFT
+  REVIEW
+  LIVE
+  UPCOMING
+  ARCHIVED
+}
+
+enum ChallengeLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model User {
+  createdAt     DateTime @default(now())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  firstName     String
+  id            String   @id @default(cuid())
+  image         String?  @default("/user.png")
+  lastName      String
+  name          String?
+  updatedAt     DateTime @updatedAt
+
+  accounts                     Account[]
+  challengesCreated            Challenge[]         @relation("ChallengeCreatedBy")
+  challengesLastUpdated        Challenge[]         @relation("ChallengeLastUpdatedBy")
+  curriculumLessonsCreated     CurriculumLesson[]  @relation("CurriculumLessonCreatedBy")
+  curriculumLessonsLastUpdated CurriculumLesson[]  @relation("CurriculumLessonLastUpdatedBy")
+  curriculumUnitsCreated       CurriculumUnit[]    @relation("CurriculumUnitCreatedBy")
+  curriculumUnitsLastUpdated   CurriculumUnit[]    @relation("CurriculumUnitLastUpdatedBy")
+  focusMapsCreated             FocusMap[]          @relation("FocusMapCreatedBy")
+  focusMapsLastUpdated         FocusMap[]          @relation("FocusMapLastUpdatedBy")
+  sessions                     Session[]
+  verificationTokens           VerificationToken[]
+
+  @@map("user")
+}
+
+model Account {
+  accessToken           String?
+  accessTokenExpiresAt  DateTime?
+  accountId             String
+  createdAt             DateTime  @default(now())
+  id                    String    @id
+  idToken               String?
+  password              String?
+  providerId            String
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  updatedAt             DateTime  @updatedAt
+  userId                String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Session {
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  id        String   @id @default(cuid())
+  ipAddress String?
+  token     String   @unique
+  updatedAt DateTime @updatedAt
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model VerificationToken {
+  expires    DateTime?
+  identifier String
+  token      String    @unique
+  userId     String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([identifier, token])
+}
+
+model Verification {
+  createdAt  DateTime? @default(now())
+  expiresAt  DateTime
+  id         String    @id
+  identifier String
+  updatedAt  DateTime? @updatedAt
+  value      String
+
+  @@map("verification")
+}
+
+model Challenge {
+  createdAt   DateTime        @default(now())
+  createdById String?
+  description String?
+  focus       String
+  hints       Json?
+  id          String          @id @default(cuid())
+  level       ChallengeLevel
+  prompt      String?
+  publishedAt DateTime?
+  rubric      Json?
+  slug        String          @unique
+  status      ChallengeStatus @default(DRAFT)
+  title       String
+  updatedAt   DateTime        @updatedAt
+  updatedById String?
+
+  createdBy User? @relation("ChallengeCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("ChallengeLastUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CurriculumUnit {
+  createdAt   DateTime @default(now())
+  createdById String?
+  description String?
+  id          String   @id @default(cuid())
+  order       Int      @default(0)
+  title       String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  weeksLabel  String?
+
+  lessons CurriculumLesson[]
+
+  createdBy User? @relation("CurriculumUnitCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("CurriculumUnitLastUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([order])
+  @@index([createdAt])
+}
+
+model CurriculumLesson {
+  createdAt   DateTime @default(now())
+  createdById String?
+  description String?
+  id          String   @id @default(cuid())
+  order       Int      @default(0)
+  title       String
+  unitId      String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  unit CurriculumUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  createdBy User? @relation("CurriculumLessonCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("CurriculumLessonLastUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([unitId])
+  @@index([order])
+  @@index([createdAt])
+}
+
+model FocusMap {
+  createdAt   DateTime @default(now())
+  createdById String?
+  description String?
+  id          String   @id @default(cuid())
+  title       String
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  edges FocusMapEdge[]
+  nodes FocusMapNode[]
+
+  createdBy User? @relation("FocusMapCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("FocusMapLastUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+model FocusMapNode {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  label       String
+  mapId       String
+  updatedAt   DateTime @updatedAt
+  x           Int?
+  y           Int?
+
+  map           FocusMap       @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  incomingEdges FocusMapEdge[] @relation("FocusMapEdgeTo")
+  outgoingEdges FocusMapEdge[] @relation("FocusMapEdgeFrom")
+
+  @@index([mapId])
+  @@index([createdAt])
+}
+
+model FocusMapEdge {
+  createdAt  DateTime @default(now())
+  fromNodeId String
+  id         String   @id @default(cuid())
+  label      String?
+  mapId      String
+  toNodeId   String
+
+  fromNode FocusMapNode @relation("FocusMapEdgeFrom", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  map      FocusMap     @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  toNode   FocusMapNode @relation("FocusMapEdgeTo", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  @@unique([mapId, fromNodeId, toNodeId])
+  @@index([mapId])
+  @@index([createdAt])
+}
